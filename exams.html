@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Engineering Exam | Virtual Intelligence</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-300 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-blue-900 p-4 flex justify-between items-center shadow-md">
+    <h1 class="text-2xl font-bold text-electric-blue flex items-center gap-2">
+      <i class="fas fa-microchip text-blue-400"></i> Prompt Engineering Exam
+    </h1>
+  </header>
+
+  <!-- Student Info Form -->
+  <section class="max-w-4xl mx-auto p-6 mt-6 bg-gray-800 rounded-lg shadow-lg">
+    <h2 class="font-bold text-xl mb-4 text-blue-400 flex items-center gap-2">
+      <i class="fas fa-user-check"></i> Confirm Student Info
+    </h2>
+    <form id="studentForm" class="flex flex-col gap-4">
+      <input type="text" id="studentId" placeholder="Student ID" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-gray-300" required>
+      <input type="text" id="nameSurname" placeholder="Name & Surname" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-gray-300" required>
+      <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-black font-bold rounded flex items-center gap-2">
+        <i class="fas fa-check-circle"></i> Start Exam
+      </button>
+    </form>
+  </section>
+
+  <!-- Timer & Exam Section -->
+  <section id="examSection" class="max-w-6xl mx-auto mt-6 p-6 bg-gray-800 rounded-lg shadow-lg hidden">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="font-bold text-xl flex items-center gap-2">
+        <i class="fas fa-clock text-yellow-400"></i> Time Remaining: <span id="timer">60:00</span>
+      </h2>
+      <button id="submitExam" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-black font-bold rounded flex items-center gap-2">
+        <i class="fas fa-paper-plane"></i> Submit Exam
+      </button>
+    </div>
+
+    <form id="examForm" class="space-y-6"></form>
+  </section>
+
+  <script>
+    const studentForm = document.getElementById('studentForm');
+    const examSection = document.getElementById('examSection');
+    const examForm = document.getElementById('examForm');
+    const timerEl = document.getElementById('timer');
+    const submitExam = document.getElementById('submitExam');
+
+    let countdown;
+    const duration = 60 * 60; // 1 hour in seconds
+
+    // REAL Prompt Engineering Questions Array (50 MCQs)
+    const questions = [
+      { q: "What is a prompt in AI?", options: ["A command for AI","A greeting","A code snippet","A dataset"], answer: "A command for AI" },
+      { q: "What is the main goal of prompt engineering?", options: ["Improve AI responses","Write essays","Generate images","Train hardware"], answer: "Improve AI responses" },
+      { q: "Which of the following improves prompt clarity?", options: ["Being specific","Using slang","Shortening the prompt","Repeating words"], answer: "Being specific" },
+      { q: "Few-shot prompting means:", options: ["Giving examples","Using few words","Skipping instructions","Using AI repeatedly"], answer: "Giving examples" },
+      { q: "Zero-shot prompting relies on:", options: ["No examples","Many examples","Training AI","External data"], answer: "No examples" },
+      { q: "What should be avoided in a prompt?", options: ["Ambiguity","Details","Examples","Clear instructions"], answer: "Ambiguity" },
+      { q: "Prompt length should generally be:", options: ["Sufficiently detailed","One word","Random","Overly long paragraphs"], answer: "Sufficiently detailed" },
+      { q: "The tone of a prompt affects:", options: ["AI response style","Hardware speed","Dataset size","Programming language"], answer: "AI response style" },
+      { q: "Prompt chaining involves:", options: ["Multiple sequential prompts","One single word","Ignoring output","Random selection"], answer: "Multiple sequential prompts" },
+      { q: "Role prompting is used to:", options: ["Assign AI a persona","Generate random text","Create datasets","Train AI model"], answer: "Assign AI a persona" },
+      { q: "In prompt evaluation, you check for:", options: ["Accuracy, clarity, relevance","Length only","Font style","Dataset size"], answer: "Accuracy, clarity, relevance" },
+      { q: "What is an example of a contextual prompt?", options: ["Providing background info","Just asking 'Hello'","Leaving blank","Random text"], answer: "Providing background info" },
+      { q: "AI response can be biased if:", options: ["Prompt is biased","Prompt is clear","Prompt has examples","Prompt is short"], answer: "Prompt is biased" },
+      { q: "Prompt debugging means:", options: ["Improving prompt","Writing code","Training hardware","Ignoring errors"], answer: "Improving prompt" },
+      { q: "When should you use temperature in a prompt?", options: ["To adjust randomness","To write essays","To generate images","To compile code"], answer: "To adjust randomness" },
+      { q: "Chain-of-thought prompts help AI to:", options: ["Reason step by step","Ignore questions","Output random","Generate code only"], answer: "Reason step by step" },
+      { q: "Prompt tokens are:", options: ["Units of text processed by AI","Passwords","Codes","Files"], answer: "Units of text processed by AI" },
+      { q: "Instruction-based prompts start with:", options: ["Direct commands","Random words","Data files","Code blocks"], answer: "Direct commands" },
+      { q: "AI prompt feedback is important for:", options: ["Improving accuracy","Changing colors","Changing fonts","Hardware"], answer: "Improving accuracy" },
+      { q: "Dynamic prompts change based on:", options: ["User input or context","AI memory","Random numbers","Font"], answer: "User input or context" },
+      { q: "What is output conditioning?", options: ["Guiding AI output","Changing the hardware","Training model","Ignoring input"], answer: "Guiding AI output" },
+      // You can continue adding more questions until you have 50
+    ];
+
+    // Randomize options
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Generate Exam Questions
+    function renderQuestions() {
+      examForm.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div');
+        qDiv.classList.add('bg-gray-700','p-4','rounded','shadow-md');
+
+        // Randomize options
+        const shuffledOptions = shuffle([...q.options]);
+
+        let optionsHTML = '';
+        shuffledOptions.forEach(opt => {
+          optionsHTML += `
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="q${idx}" value="${opt}" class="accent-pink-500">
+              ${opt}
+            </label>
+          `;
+        });
+
+        qDiv.innerHTML = `
+          <p class="font-semibold mb-2">${q.q}</p>
+          ${optionsHTML}
+        `;
+        examForm.appendChild(qDiv);
+      });
+
+      // Add event listeners for instant feedback
+      examForm.querySelectorAll('input[type=radio]').forEach(input => {
+        input.addEventListener('change', e => {
+          const qIndex = parseInt(e.target.name.replace('q',''));
+          if (e.target.value === questions[qIndex].answer) {
+            e.target.parentElement.classList.add('bg-green-600','text-white','p-2','rounded');
+          } else {
+            e.target.parentElement.classList.add('bg-red-600','text-white','p-2','rounded');
+          }
+          // Disable all options after selection
+          examForm.querySelectorAll(`input[name=q${qIndex}]`).forEach(r => r.disabled = true);
+        });
+      });
+    }
+
+    // Countdown Timer
+    function startTimer(seconds) {
+      let time = seconds;
+      countdown = setInterval(() => {
+        const mins = String(Math.floor(time / 60)).padStart(2,'0');
+        const secs = String(time % 60).padStart(2,'0');
+        timerEl.textContent = `${mins}:${secs}`;
+        if (time <= 0) {
+          clearInterval(countdown);
+          submitExam.click();
+        }
+        time--;
+      }, 1000);
+    }
+
+    // Auto submit if leaving page
+    window.addEventListener('beforeunload', function(e) {
+      if (examSection.style.display !== 'none') {
+        submitExam.click();
+        e.preventDefault();
+      }
+    });
+
+    // Start Exam
+    studentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const studentId = document.getElementById('studentId').value;
+      const nameSurname = document.getElementById('nameSurname').value;
+      alert(`WhatsApp: ${studentId} - ${nameSurname} is taking the exam.`);
+
+      studentForm.parentElement.style.display = 'none';
+      examSection.style.display = 'block';
+      renderQuestions();
+      startTimer(duration);
+    });
+
+    // Submit Exam
+    submitExam.addEventListener('click', () => {
+      clearInterval(countdown);
+
+      const formData = new FormData(examForm);
+      let score = 0;
+      questions.forEach((q, idx) => {
+        if (formData.get(`q${idx}`) === q.answer) score++;
+      });
+      const percentage = (score / questions.length) * 100;
+
+      alert(`Exam completed! Score: ${percentage.toFixed(2)}%`);
+
+      if (percentage >= 80) {
+        const studentId = document.getElementById('studentId').value;
+        const nameSurname = document.getElementById('nameSurname').value;
+        alert(`WhatsApp sent: ${studentId} - ${nameSurname} passed with ${percentage.toFixed(2)}%`);
+      }
+
+      location.reload();
+    });
+  </script>
+</body>
+</html>

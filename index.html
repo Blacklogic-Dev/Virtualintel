@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Intelligence – Login & Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gradient-to-r from-gray-800 via-gray-900 to-blue-900 flex items-center justify-center min-h-screen p-4">
+
+  <div class="bg-gray-900/90 p-8 rounded-xl shadow-xl w-full max-w-lg">
+
+<!-- Logo -->
+<div class="flex justify-center mb-6">
+  <img 
+    src="virtual.jpg" 
+    alt="Virtual Intelligence Logo"
+    class="w-[100%] h-[150px] object-cover rounded-2xl border-4 border-blue-400"
+  >
+</div>
+
+    <!-- Toggle -->
+    <div class="flex mb-6 justify-center">
+      <button id="loginBtn" class="px-4 py-2 rounded-l bg-blue-500 text-white font-bold">Login</button>
+      <button id="registerBtn" class="px-4 py-2 rounded-r bg-pink-500 text-white font-bold">Register</button>
+    </div>
+
+    <!-- Form -->
+    <form id="authForm" class="space-y-4 text-gray-300">
+
+      <!-- Login -->
+      <div id="loginFields">
+        <div>
+          <label class="block mb-1">Student ID</label>
+          <input type="text" id="studentIdLogin" placeholder="Enter Student ID" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div>
+          <label class="block mb-1">Password </label>
+          <input type="password" id="passwordLogin" placeholder="Enter Password" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-400">
+        </div>
+        <button type="button" id="loginSubmit" class="w-full py-2 bg-blue-500 font-bold rounded hover:bg-blue-600 transition">Login</button>
+      </div>
+
+      <!-- Register -->
+      <div id="registerFields" class="hidden">
+        <div>
+          <label class="block mb-1">Department</label>
+          <input type="text" value="Department of Artificial Intelligence and Communication" readonly class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-gray-400 cursor-not-allowed">
+        </div>
+        <div>
+          <label class="block mb-1">Course</label>
+          <input type="text" value="Prompt Engineering" readonly class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-gray-400 cursor-not-allowed">
+        </div>
+        <div class="flex gap-2">
+          <div class="flex-1">
+            <label class="block mb-1">Name</label>
+            <input type="text" id="nameR" placeholder="First Name" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-pink-400">
+          </div>
+          <div class="flex-1">
+            <label class="block mb-1">Surname</label>
+            <input type="text" id="surnameR" placeholder="Surname" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-pink-400">
+          </div>
+        </div>
+        <div>
+          <label class="block mb-1">ID Number</label>
+          <input type="text" id="idNumber" placeholder="SA ID Number" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-pink-400">
+        </div>
+        <div>
+          <label class="block mb-1">WhatsApp Number</label>
+          <input type="text" id="whatsapp" placeholder="e.g. 060XXXXXXX" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-pink-400">
+        </div>
+        <div>
+          <label class="block mb-1">Email</label>
+          <input type="email" id="email" placeholder="Enter Email" class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-pink-400">
+        </div>
+        <button type="button" id="generateReceipt" class="w-full py-2 bg-pink-500 font-bold rounded hover:bg-pink-600 transition">Generate Receipt</button>
+      </div>
+
+      <!-- Receipt -->
+      <div id="receiptPreview" class="hidden bg-white p-4 rounded text-black font-mono">
+        <pre id="receipt"></pre>
+        <button type="button" id="downloadReceipt" class="mt-2 px-4 py-2 bg-green-400 font-bold rounded hover:bg-green-500 transition">Download Receipt</button>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" id="submitBtn" disabled class="w-full py-2 bg-pink-400 font-bold rounded hover:bg-pink-500 transition">Submit</button>
+    </form>
+
+  </div>
+
+  <script>
+    // Toggle Login/Register
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const loginFields = document.getElementById('loginFields');
+    const registerFields = document.getElementById('registerFields');
+    const submitBtn = document.getElementById('submitBtn');
+
+    loginBtn.addEventListener('click', () => {
+      loginFields.classList.remove('hidden');
+      registerFields.classList.add('hidden');
+      loginBtn.classList.replace('bg-pink-500', 'bg-blue-500');
+      registerBtn.classList.replace('bg-blue-500', 'bg-pink-500');
+      submitBtn.disabled = false;
+    });
+
+    registerBtn.addEventListener('click', () => {
+      loginFields.classList.add('hidden');
+      registerFields.classList.remove('hidden');
+      loginBtn.classList.replace('bg-blue-500', 'bg-pink-500');
+      registerBtn.classList.replace('bg-pink-500', 'bg-blue-500');
+      submitBtn.disabled = true;
+    });
+
+    // Login button redirects
+    document.getElementById('loginSubmit').addEventListener('click', () => {
+      window.location.href = "dashboard.html";
+    });
+
+    // Generate auto Student ID
+    function generateStudentID() {
+      return 'VI' + Math.floor(100000 + Math.random() * 900000);
+    }
+
+    // Generate receipt
+    const generateBtn = document.getElementById('generateReceipt');
+    const receiptDiv = document.getElementById('receiptPreview');
+    const receiptPre = document.getElementById('receipt');
+
+    generateBtn.addEventListener('click', () => {
+      const studentId = generateStudentID();
+      document.getElementById('studentIdLogin').value = studentId;
+
+      const name = document.getElementById('nameR').value;
+      const surname = document.getElementById('surnameR').value;
+      const idNum = document.getElementById('idNumber').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+
+      if(!name || !surname || !idNum || !whatsapp) {
+        alert("Fill all fields to generate receipt!");
+        return;
+      }
+
+      const password = idNum.slice(0,6);
+
+      receiptPre.textContent = `
+==============
+VIRTUAL (VI)
+==============
+Student ID : ${studentId}
+Password   : ${password}
+Name       : ${name}
+Surname    : ${surname}
+ID Number  : ${idNum}
+W/A Number : ${whatsapp}
+==============
+      `;
+      receiptDiv.classList.remove('hidden');
+    });
+
+    // Download receipt and unlock submit
+    document.getElementById('downloadReceipt').addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont("Courier", "normal");
+      doc.text(receiptPre.textContent, 10, 10);
+      const fileName = `${document.getElementById('nameR').value}_VI_Receipt.pdf`;
+      doc.save(fileName);
+      submitBtn.disabled = false;
+    });
+
+    // Submit sends WhatsApp message
+    document.getElementById('authForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const studentId = document.getElementById('studentIdLogin').value;
+      const name = document.getElementById('nameR').value;
+      const surname = document.getElementById('surnameR').value;
+      const message = `Student ID: ${studentId}\nName: ${name}\nSurname: ${surname} has registered/completed receipt.`;
+      const waLink = `https://wa.me/27606614909?text=${encodeURIComponent(message)}`;
+      window.open(waLink, "_blank");
+      alert("Receipt sent to WhatsApp!");
+    });
+  </script>
+
+</body>
+</html>

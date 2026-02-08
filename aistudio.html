@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt & AI Studio | Virtual Intelligence</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-300 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-blue-900 p-4 flex justify-between items-center shadow-md">
+    <h1 class="text-2xl font-bold text-electric-blue flex items-center gap-2">
+      <i class="fas fa-microchip text-blue-400"></i> Prompt & AI Studio
+    </h1>
+    <nav>
+
+  </header>
+
+  <!-- Instructions -->
+  <section class="max-w-4xl mx-auto p-6 mt-6 bg-gray-800 rounded-lg shadow-lg">
+    <h2 class="font-bold text-xl mb-4 text-blue-400 flex items-center gap-2">
+      <i class="fas fa-info-circle text-yellow-400"></i> Instructions
+    </h2>
+    <ol class="list-decimal list-inside space-y-2">
+      <li><i class="fas fa-angle-right text-pink-400 mr-2"></i>Select the type of communication from the dropdown.</li>
+      <li><i class="fas fa-angle-right text-pink-400 mr-2"></i>Write one line describing what you want to talk about.</li>
+      <li><i class="fas fa-angle-right text-pink-400 mr-2"></i>Describe the expected result.</li>
+      <li><i class="fas fa-angle-right text-pink-400 mr-2"></i>Click "Generate Prompt" to create your AI prompt.</li>
+      <li><i class="fas fa-angle-right text-pink-400 mr-2"></i>Copy the prompt using the copy icon or click "OpenAI" to explore.</li>
+    </ol>
+  </section>
+
+  <!-- Prompt Studio Form -->
+  <section class="max-w-4xl mx-auto mt-6 p-6 bg-gray-800 rounded-lg shadow-lg">
+    <form id="promptForm" class="flex flex-col gap-4">
+
+      <!-- Type of Communication -->
+      <div>
+        <label for="type" class="block mb-1 font-semibold"><i class="fas fa-list-alt mr-2"></i>Type of Communication</label>
+        <select id="type" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-gray-300">
+          <option value="Educational">Educational</option>
+          <option value="Development">Development</option>
+          <option value="Design">Design</option>
+          <option value="Research">Research</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Exploration">Exploration</option>
+          <option value="More">More</option>
+        </select>
+      </div>
+
+      <!-- Topic / One Line -->
+      <div>
+        <label for="topic" class="block mb-1 font-semibold"><i class="fas fa-pen-nib mr-2"></i>What you would talk about (one line)</label>
+        <input type="text" id="topic" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-gray-300" placeholder="Enter your topic" required>
+      </div>
+
+      <!-- Expected Result -->
+      <div>
+        <label for="result" class="block mb-1 font-semibold"><i class="fas fa-bullseye mr-2"></i>Expected Result</label>
+        <input type="text" id="result" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-gray-300" placeholder="What you expect from AI" required>
+      </div>
+
+      <!-- Generated Prompt Card -->
+      <div class="relative bg-gray-700 rounded-lg p-4 mt-4 shadow-lg">
+        <div class="absolute top-2 right-2 cursor-pointer text-blue-400 hover:text-blue-600" id="copyPrompt">
+          <i class="fas fa-clipboard fa-lg"></i>
+        </div>
+        <textarea id="generatedPrompt" class="w-full bg-gray-700 text-gray-100 p-4 rounded resize-none" rows="5" readonly
+          placeholder="Your AI prompt will appear here..."></textarea>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex gap-4 mt-2">
+        <button type="button" id="generateBtn" class="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-black font-bold rounded flex-1">
+          <i class="fas fa-magic mr-2"></i> Generate Prompt
+        </button>
+        <button type="button" id="openAIBtn" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-black font-bold rounded flex-1">
+          <i class="fas fa-microchip mr-2"></i> Open AI
+        </button>
+      </div>
+
+    </form>
+  </section>
+
+  <!-- JS Functionality -->
+  <script>
+    const generateBtn = document.getElementById('generateBtn');
+    const openAIBtn = document.getElementById('openAIBtn');
+    const generatedPrompt = document.getElementById('generatedPrompt');
+    const copyPrompt = document.getElementById('copyPrompt');
+
+    // Function to shape prompt based on type
+    function shapePrompt(type, topic, result) {
+      let action = "";
+      switch(type) {
+        case "Educational": action = "explain clearly"; break;
+        case "Development": action = "guide me to develop"; break;
+        case "Design": action = "create a design for"; break;
+        case "Research": action = "help me research"; break;
+        case "Engineering": action = "engineer a solution for"; break;
+        case "Exploration": action = "explore thoroughly"; break;
+        default: action = "assist me with"; break;
+      }
+      return `Hi, please help me to ${action} about "${topic}" to achieve "${result}".`;
+    }
+
+    generateBtn.addEventListener('click', () => {
+      const type = document.getElementById('type').value;
+      const topic = document.getElementById('topic').value;
+      const result = document.getElementById('result').value;
+
+      if (!topic || !result) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      generatedPrompt.value = shapePrompt(type, topic, result);
+    });
+
+    copyPrompt.addEventListener('click', () => {
+      if (!generatedPrompt.value) return;
+      navigator.clipboard.writeText(generatedPrompt.value);
+      alert('Prompt copied to clipboard!');
+    });
+
+    openAIBtn.addEventListener('click', () => {
+      if (!generatedPrompt.value) {
+        alert('Generate a prompt first!');
+        return;
+      }
+      window.open('https://chat.openai.com/', '_blank');
+    });
+  </script>
+
+</body>
+</html>

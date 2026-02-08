@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Intelligence Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-gray-300">
+
+<!-- Top Banner -->
+<header
+  class="h-[300px] w-full flex items-center justify-center bg-center bg-cover"
+  style="background-image: url('code.jpg');"
+>
+  <div class="text-center bg-black/60 px-6 py-4 rounded-xl">
+    <h1 class="text-4xl font-bold text-white"></h1>
+    <p class="mt-2 text-lg text-gray-300">Department of AI & Communication</p>
+  </div>
+</header>
+  </header>
+<!-- Grid Section -->
+<main class="max-w-6xl mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+
+  <!-- Grid 1: Learn the Art of Prompting -->
+  <div class="bg-gray-800 rounded-lg p-6 shadow-lg flex flex-col items-center hover:scale-105 transition">
+    <i class="fas fa-lightbulb text-5xl text-blue-400 mb-4"></i>
+    <h2 class="font-bold text-xl mb-2 text-center">Learn the Art of Prompting</h2>
+    <p class="text-center text-gray-400">Master the right way to talk to any AI for accurate results.</p>
+  </div>
+
+  <!-- Grid 2: Endless Learning -->
+  <div class="bg-gray-800 rounded-lg p-6 shadow-lg flex flex-col items-center hover:scale-105 transition">
+    <i class="fas fa-infinity text-5xl text-green-400 mb-4"></i>
+    <h2 class="font-bold text-xl mb-2 text-center">Endless Learning</h2>
+    <p class="text-center text-gray-400">Explore any topic and communicate effectively with AI anywhere.</p>
+  </div>
+
+  <!-- Grid 3: Prompt Engine -->
+  <div class="bg-gray-800 rounded-lg p-6 shadow-lg flex flex-col items-center hover:scale-105 transition">
+    <i class="fas fa-robot text-5xl text-pink-400 mb-4"></i>
+    <h2 class="font-bold text-xl mb-2 text-center">Prompt Engine</h2>
+    <p class="text-center text-gray-400">AI-powered prompt generation to help you create precise inputs.</p>
+  </div>
+
+  <!-- Grid 4: Certificate of Completion -->
+  <div class="bg-gray-800 rounded-lg p-6 shadow-lg flex flex-col items-center hover:scale-105 transition">
+    <i class="fas fa-certificate text-5xl text-yellow-400 mb-4"></i>
+    <h2 class="font-bold text-xl mb-2 text-center">Certificate of Completion</h2>
+    <p class="text-center text-gray-400">Certificates are emailed upon completion of the Prompt Engineering course.</p>
+  </div>
+
+</main>
+
+  </main>
+
+  <!-- Hamburger Menu -->
+  <nav class="fixed top-4 right-4 z-50">
+    <div class="relative inline-block text-left">
+      <button id="menuButton" class="inline-flex justify-center w-full rounded-md bg-blue-500 p-3 text-sm font-medium text-white hover:bg-blue-600">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div id="menuDropdown" class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5">
+        <div class="py-1">
+          <a href="materials.html" class="block px-4 py-2 text-gray-300 hover:bg-blue-700">Materials</a>
+          <a href="aistudio.html" class="block px-4 py-2 text-gray-300 hover:bg-blue-700">Prompt & AI Studio</a>
+          <a href="exams.html" class="block px-4 py-2 text-gray-300 hover:bg-blue-700">Exam</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <script>
+    // Hamburger menu toggle
+    const menuButton = document.getElementById('menuButton');
+    const menuDropdown = document.getElementById('menuDropdown');
+    menuButton.addEventListener('click', () => {
+      menuDropdown.classList.toggle('hidden');
+    });
+  </script>
+
+</body>
+</html>
