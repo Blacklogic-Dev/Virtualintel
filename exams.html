@@ -7,7 +7,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-gray-300 min-h-screen">
+<body class="bg-gray-900 text-gray-300 min-h-screen flex flex-col">
 
   <!-- Header -->
   <header class="bg-blue-900 p-4 flex justify-between items-center shadow-md">
@@ -31,30 +31,55 @@
   </section>
 
   <!-- Timer & Exam Section -->
-  <section id="examSection" class="max-w-6xl mx-auto mt-6 p-6 bg-gray-800 rounded-lg shadow-lg hidden">
+  <section id="examSection" class="max-w-6xl mx-auto mt-6 p-6 bg-gray-800 rounded-lg shadow-lg hidden flex flex-col h-[80vh]">
+    
+    <!-- Timer -->
     <div class="flex justify-between items-center mb-4">
       <h2 class="font-bold text-xl flex items-center gap-2">
         <i class="fas fa-clock text-yellow-400"></i> Time Remaining: <span id="timer">60:00</span>
       </h2>
-      <button id="submitExam" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-black font-bold rounded flex items-center gap-2">
-        <i class="fas fa-paper-plane"></i> Submit Exam
+    </div>
+
+    <!-- Exam Questions (scrollable) -->
+    <form id="examForm" class="space-y-6 overflow-y-auto flex-1"></form>
+
+    <!-- Submit Button at Bottom -->
+    <div class="mt-4 flex justify-center">
+      <button id="submitExam" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-black font-bold rounded flex items-center gap-2">
+        <i class="fas fa-paper-plane"></i> Show Results
       </button>
     </div>
-    <form id="examForm" class="space-y-6"></form>
+
+    <!-- Result Display -->
+    <div id="resultDiv" class="mt-6 p-4 bg-gray-700 rounded-lg text-center hidden">
+      <h3 class="text-xl font-bold mb-2 text-green-400">Your Results</h3>
+      <p id="resultText" class="text-lg"></p>
+    </div>
+
   </section>
 
- <script>
+</body>
+
+<script>
 const studentForm = document.getElementById('studentForm');
 const examSection = document.getElementById('examSection');
 const examForm = document.getElementById('examForm');
 const timerEl = document.getElementById('timer');
 const submitExam = document.getElementById('submitExam');
 
+// Create a div to show results
+let resultDiv = document.createElement('div');
+resultDiv.id = 'resultDiv';
+resultDiv.classList.add('hidden','mt-6','p-4','rounded','bg-gray-700','text-white','shadow-md','max-w-4xl','mx-auto');
+examSection.appendChild(resultDiv);
+let resultText = document.createElement('p');
+resultDiv.appendChild(resultText);
+
 let countdown;
-const duration = 60 * 60; // 1 hour in seconds
+const duration = 60 * 60; // 1 hour
 const passMark = 80; // 80%
 
-// --- 50 Questions (25 MCQs + 25 True/False) ---
+// Questions array (same as your snippet)
 const questions = [
   { q: "What is a prompt in AI?", options: ["A command for AI","A greeting","A code snippet","A dataset"], answer: "A command for AI" },
   { q: "Main goal of prompt engineering?", options: ["Improve AI responses","Write essays","Generate images","Train hardware"], answer: "Improve AI responses" },
@@ -66,7 +91,7 @@ const questions = [
   { q: "Dynamic prompts change based on:", options: ["User input or context","AI memory","Random numbers","Font"], answer: "User input or context" },
   { q: "Prompt tokens are:", options: ["Units of text processed by AI","Passwords","Codes","Files"], answer: "Units of text processed by AI" },
   { q: "Chain-of-thought prompts help AI to:", options: ["Reason step by step","Ignore questions","Output random","Generate code only"], answer: "Reason step by step" },
-  { q: "Instruction-based prompts start with:", options: ["Direct commands","Random words","Data files","Code blocks"], answer: "Direct commands" },
+    { q: "Instruction-based prompts start with:", options: ["Direct commands","Random words","Data files","Code blocks"], answer: "Direct commands" },
   { q: "AI prompt feedback is important for:", options: ["Improving accuracy","Changing colors","Changing fonts","Hardware"], answer: "Improving accuracy" },
   { q: "Output conditioning means:", options: ["Guiding AI output","Changing the hardware","Training model","Ignoring input"], answer: "Guiding AI output" },
   { q: "Contextual prompt example?", options: ["Providing background info","Just saying 'Hello'","Leaving blank","Random text"], answer: "Providing background info" },
@@ -107,9 +132,10 @@ const questions = [
   { q: "Role prompts affect AI persona.", options: ["True","False"], answer: "True" },
   { q: "Prompt clarity is optional.", options: ["True","False"], answer: "False" },
   { q: "Prompt chaining can improve reasoning.", options: ["True","False"], answer: "True" },
+  // Add all remaining questions here...
 ];
 
-// Shuffle options for each question
+// Shuffle function
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -118,12 +144,12 @@ function shuffle(array) {
   return array;
 }
 
-// Render all questions
+// Render questions
 function renderQuestions() {
   examForm.innerHTML = '';
   questions.forEach((q, idx) => {
     const qDiv = document.createElement('div');
-    qDiv.classList.add('bg-gray-700','p-4','rounded','shadow-md');
+    qDiv.classList.add('bg-gray-700','p-4','rounded','shadow-md','mb-4');
 
     const shuffledOptions = shuffle([...q.options]);
     let optionsHTML = '';
@@ -138,18 +164,6 @@ function renderQuestions() {
 
     qDiv.innerHTML = `<p class="font-semibold mb-2">${q.q}</p>${optionsHTML}`;
     examForm.appendChild(qDiv);
-
-    // Instant feedback
-    examForm.querySelectorAll(`input[name=q${idx}]`).forEach(input => {
-      input.addEventListener('change', e => {
-        if (e.target.value === questions[idx].answer) {
-          e.target.parentElement.classList.add('bg-green-600','text-white','p-2','rounded');
-        } else {
-          e.target.parentElement.classList.add('bg-red-600','text-white','p-2','rounded');
-        }
-        examForm.querySelectorAll(`input[name=q${idx}]`).forEach(r => r.disabled = true);
-      });
-    });
   });
 }
 
@@ -162,13 +176,13 @@ function startTimer(seconds) {
     timerEl.textContent = `${mins}:${secs}`;
     if (time <= 0) {
       clearInterval(countdown);
-      submitExam.click();
+      calculateResults();
     }
     time--;
   }, 1000);
 }
 
-// WhatsApp Notification
+// WhatsApp notification
 function sendWhatsApp(message) {
   const number = "0606614909";
   const url = `https://api.whatsapp.com/send?phone=${number}&text=${encodeURIComponent(message)}`;
@@ -188,29 +202,39 @@ studentForm.addEventListener('submit', e => {
   startTimer(duration);
 });
 
-// Submit Exam
-submitExam.addEventListener('click', () => {
+// Calculate Results
+function calculateResults() {
   clearInterval(countdown);
   const formData = new FormData(examForm);
   let score = 0;
   questions.forEach((q, idx) => {
     if (formData.get(`q${idx}`) === q.answer) score++;
   });
+
   const total = questions.length;
+  const wrong = total - score;
   const percentage = (score / total) * 100;
   const nameSurname = document.getElementById('nameSurname').value;
 
   let resultMsg = '';
   if (percentage >= passMark) {
-    resultMsg = `🎉 Congratulations ${nameSurname}! You have passed 👨‍💻🔥✅\nScore: ${score}/${total} (${percentage.toFixed(2)}%)`;
+    resultMsg = `🎉 Congratulations ${nameSurname}! You passed 👨‍💻🔥✅\nScore: ${score}/${total} (${percentage.toFixed(2)}%)\nWrong Answers: ${wrong}`;
+    resultDiv.classList.add('bg-green-700');
+    resultDiv.classList.remove('bg-red-700','hidden');
   } else {
-    resultMsg = `😅 Keep pushing, ${nameSurname}! Don’t give up 💪🔥✨\nScore: ${score}/${total} (${percentage.toFixed(2)}%)`;
+    resultMsg = `😅 Keep pushing, ${nameSurname}! Don’t give up 💪🔥✨\nScore: ${score}/${total} (${percentage.toFixed(2)}%)\nWrong Answers: ${wrong}`;
+    resultDiv.classList.add('bg-red-700');
+    resultDiv.classList.remove('bg-green-700','hidden');
   }
 
+  resultText.textContent = resultMsg;
+  resultDiv.classList.remove('hidden');
+
   sendWhatsApp(resultMsg);
-  alert(resultMsg);
-  location.reload();
-});
+}
+
+// Submit Exam / Show Results button
+submitExam.addEventListener('click', calculateResults);
 </script>
-</body>
 </html>
+
