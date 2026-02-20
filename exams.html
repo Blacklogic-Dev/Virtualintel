@@ -11,7 +11,7 @@
 
   <!-- Header -->
   <header class="bg-blue-900 p-4 flex justify-between items-center shadow-md">
-    <h1 class="text-2xl font-bold text-electric-blue flex items-center gap-2">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
       <i class="fas fa-microchip text-blue-400"></i> Prompt Engineering Exam
     </h1>
   </header>
@@ -43,175 +43,174 @@
     <form id="examForm" class="space-y-6"></form>
   </section>
 
-  <script>
-    const studentForm = document.getElementById('studentForm');
-    const examSection = document.getElementById('examSection');
-    const examForm = document.getElementById('examForm');
-    const timerEl = document.getElementById('timer');
-    const submitExam = document.getElementById('submitExam');
+ <script>
+const studentForm = document.getElementById('studentForm');
+const examSection = document.getElementById('examSection');
+const examForm = document.getElementById('examForm');
+const timerEl = document.getElementById('timer');
+const submitExam = document.getElementById('submitExam');
 
-    let countdown;
-    const duration = 60 * 60; // 1 hour
+let countdown;
+const duration = 60 * 60; // 1 hour in seconds
+const passMark = 80; // 80%
 
-    // --- 25 MCQs + 25 True/False --- 
-    const questions = [
-      // 25 MCQs
-      { q: "What is a prompt in AI?", options: ["A command for AI","A greeting","A code snippet","A dataset"], answer: "A command for AI" },
-      { q: "Main goal of prompt engineering?", options: ["Improve AI responses","Write essays","Generate images","Train hardware"], answer: "Improve AI responses" },
-      { q: "Few-shot prompting means:", options: ["Giving examples","Using few words","Skipping instructions","Using AI repeatedly"], answer: "Giving examples" },
-      { q: "Zero-shot prompting relies on:", options: ["No examples","Many examples","Training AI","External data"], answer: "No examples" },
-      { q: "What should be avoided in a prompt?", options: ["Ambiguity","Details","Examples","Clear instructions"], answer: "Ambiguity" },
-      { q: "Prompt chaining involves:", options: ["Multiple sequential prompts","One single word","Ignoring output","Random selection"], answer: "Multiple sequential prompts" },
-      { q: "Role prompting is used to:", options: ["Assign AI a persona","Generate random text","Create datasets","Train AI model"], answer: "Assign AI a persona" },
-      { q: "Dynamic prompts change based on:", options: ["User input or context","AI memory","Random numbers","Font"], answer: "User input or context" },
-      { q: "Prompt tokens are:", options: ["Units of text processed by AI","Passwords","Codes","Files"], answer: "Units of text processed by AI" },
-      { q: "Chain-of-thought prompts help AI to:", options: ["Reason step by step","Ignore questions","Output random","Generate code only"], answer: "Reason step by step" },
-      { q: "Instruction-based prompts start with:", options: ["Direct commands","Random words","Data files","Code blocks"], answer: "Direct commands" },
-      { q: "AI prompt feedback is important for:", options: ["Improving accuracy","Changing colors","Changing fonts","Hardware"], answer: "Improving accuracy" },
-      { q: "Output conditioning means:", options: ["Guiding AI output","Changing the hardware","Training model","Ignoring input"], answer: "Guiding AI output" },
-      { q: "Contextual prompt example?", options: ["Providing background info","Just saying 'Hello'","Leaving blank","Random text"], answer: "Providing background info" },
-      { q: "Prompt debugging involves:", options: ["Improving prompt","Writing code","Training hardware","Ignoring errors"], answer: "Improving prompt" },
-      { q: "Prompt clarity improves:", options: ["Accuracy","Randomness","Speed","Font size"], answer: "Accuracy" },
-      { q: "Prompt length should be:", options: ["Sufficiently detailed","One word","Random","Overly long paragraphs"], answer: "Sufficiently detailed" },
-      { q: "Tone affects:", options: ["AI response style","Hardware speed","Dataset size","Programming language"], answer: "AI response style" },
-      { q: "AI can be biased if:", options: ["Prompt is biased","Prompt is clear","Prompt has examples","Prompt is short"], answer: "Prompt is biased" },
-      { q: "Temperature in a prompt controls:", options: ["Randomness","Length","Color","Font"], answer: "Randomness" },
-      { q: "Zero-shot vs Few-shot?", options: ["Zero-shot has no examples","Zero-shot has examples","Few-shot ignores examples","Both same"], answer: "Zero-shot has no examples" },
-      { q: "Prompt chaining helps:", options: ["Complex reasoning","Speed only","Font style","Nothing"], answer: "Complex reasoning" },
-      { q: "Prompt evaluation checks:", options: ["Accuracy, clarity, relevance","Length only","Font style","Dataset size"], answer: "Accuracy, clarity, relevance" },
-      { q: "Role prompting assigns:", options: ["AI persona","Random colors","Dataset","Font"], answer: "AI persona" },
-      { q: "Prompt should avoid:", options: ["Ambiguity","Examples","Details","Clarity"], answer: "Ambiguity" },
+// --- 50 Questions (25 MCQs + 25 True/False) ---
+const questions = [
+  { q: "What is a prompt in AI?", options: ["A command for AI","A greeting","A code snippet","A dataset"], answer: "A command for AI" },
+  { q: "Main goal of prompt engineering?", options: ["Improve AI responses","Write essays","Generate images","Train hardware"], answer: "Improve AI responses" },
+  { q: "Few-shot prompting means:", options: ["Giving examples","Using few words","Skipping instructions","Using AI repeatedly"], answer: "Giving examples" },
+  { q: "Zero-shot prompting relies on:", options: ["No examples","Many examples","Training AI","External data"], answer: "No examples" },
+  { q: "What should be avoided in a prompt?", options: ["Ambiguity","Details","Examples","Clear instructions"], answer: "Ambiguity" },
+  { q: "Prompt chaining involves:", options: ["Multiple sequential prompts","One single word","Ignoring output","Random selection"], answer: "Multiple sequential prompts" },
+  { q: "Role prompting is used to:", options: ["Assign AI a persona","Generate random text","Create datasets","Train AI model"], answer: "Assign AI a persona" },
+  { q: "Dynamic prompts change based on:", options: ["User input or context","AI memory","Random numbers","Font"], answer: "User input or context" },
+  { q: "Prompt tokens are:", options: ["Units of text processed by AI","Passwords","Codes","Files"], answer: "Units of text processed by AI" },
+  { q: "Chain-of-thought prompts help AI to:", options: ["Reason step by step","Ignore questions","Output random","Generate code only"], answer: "Reason step by step" },
+  { q: "Instruction-based prompts start with:", options: ["Direct commands","Random words","Data files","Code blocks"], answer: "Direct commands" },
+  { q: "AI prompt feedback is important for:", options: ["Improving accuracy","Changing colors","Changing fonts","Hardware"], answer: "Improving accuracy" },
+  { q: "Output conditioning means:", options: ["Guiding AI output","Changing the hardware","Training model","Ignoring input"], answer: "Guiding AI output" },
+  { q: "Contextual prompt example?", options: ["Providing background info","Just saying 'Hello'","Leaving blank","Random text"], answer: "Providing background info" },
+  { q: "Prompt debugging involves:", options: ["Improving prompt","Writing code","Training hardware","Ignoring errors"], answer: "Improving prompt" },
+  { q: "Prompt clarity improves:", options: ["Accuracy","Randomness","Speed","Font size"], answer: "Accuracy" },
+  { q: "Prompt length should be:", options: ["Sufficiently detailed","One word","Random","Overly long paragraphs"], answer: "Sufficiently detailed" },
+  { q: "Tone affects:", options: ["AI response style","Hardware speed","Dataset size","Programming language"], answer: "AI response style" },
+  { q: "AI can be biased if:", options: ["Prompt is biased","Prompt is clear","Prompt has examples","Prompt is short"], answer: "Prompt is biased" },
+  { q: "Temperature in a prompt controls:", options: ["Randomness","Length","Color","Font"], answer: "Randomness" },
+  { q: "Zero-shot vs Few-shot?", options: ["Zero-shot has no examples","Zero-shot has examples","Few-shot ignores examples","Both same"], answer: "Zero-shot has no examples" },
+  { q: "Prompt chaining helps:", options: ["Complex reasoning","Speed only","Font style","Nothing"], answer: "Complex reasoning" },
+  { q: "Prompt evaluation checks:", options: ["Accuracy, clarity, relevance","Length only","Font style","Dataset size"], answer: "Accuracy, clarity, relevance" },
+  { q: "Role prompting assigns:", options: ["AI persona","Random colors","Dataset","Font"], answer: "AI persona" },
+  { q: "Prompt should avoid:", options: ["Ambiguity","Examples","Details","Clarity"], answer: "Ambiguity" },
+  // --- 25 True/False ---
+  { q: "AI can understand ambiguous prompts easily.", options: ["True","False"], answer: "False" },
+  { q: "Few-shot prompting provides examples to AI.", options: ["True","False"], answer: "True" },
+  { q: "Zero-shot prompting requires no examples.", options: ["True","False"], answer: "True" },
+  { q: "Prompt clarity improves AI accuracy.", options: ["True","False"], answer: "True" },
+  { q: "Role prompting assigns AI a persona.", options: ["True","False"], answer: "True" },
+  { q: "Random text is a good prompt.", options: ["True","False"], answer: "False" },
+  { q: "Dynamic prompts change with context.", options: ["True","False"], answer: "True" },
+  { q: "Temperature setting adjusts AI randomness.", options: ["True","False"], answer: "True" },
+  { q: "Chain-of-thought prompts prevent reasoning.", options: ["True","False"], answer: "False" },
+  { q: "Output conditioning guides AI output.", options: ["True","False"], answer: "True" },
+  { q: "Prompt evaluation ignores clarity.", options: ["True","False"], answer: "False" },
+  { q: "Instruction-based prompts start with commands.", options: ["True","False"], answer: "True" },
+  { q: "Ambiguous prompts improve AI output.", options: ["True","False"], answer: "False" },
+  { q: "AI output depends on prompt quality.", options: ["True","False"], answer: "True" },
+  { q: "Few-shot and zero-shot are same.", options: ["True","False"], answer: "False" },
+  { q: "Prompt tokens are units of text.", options: ["True","False"], answer: "True" },
+  { q: "Chain-of-thought is for step-by-step reasoning.", options: ["True","False"], answer: "True" },
+  { q: "Prompt feedback improves accuracy.", options: ["True","False"], answer: "True" },
+  { q: "Contextual prompts give background info.", options: ["True","False"], answer: "True" },
+  { q: "Random word prompts are effective.", options: ["True","False"], answer: "False" },
+  { q: "Prompt length should be detailed enough.", options: ["True","False"], answer: "True" },
+  { q: "Prompt tone affects AI response.", options: ["True","False"], answer: "True" },
+  { q: "Role prompts affect AI persona.", options: ["True","False"], answer: "True" },
+  { q: "Prompt clarity is optional.", options: ["True","False"], answer: "False" },
+  { q: "Prompt chaining can improve reasoning.", options: ["True","False"], answer: "True" },
+];
 
-      // 25 True/False
-      { q: "AI can understand ambiguous prompts easily.", options: ["True","False"], answer: "False" },
-      { q: "Few-shot prompting provides examples to AI.", options: ["True","False"], answer: "True" },
-      { q: "Zero-shot prompting requires no examples.", options: ["True","False"], answer: "True" },
-      { q: "Prompt clarity improves AI accuracy.", options: ["True","False"], answer: "True" },
-      { q: "Role prompting assigns AI a persona.", options: ["True","False"], answer: "True" },
-      { q: "Random text is a good prompt.", options: ["True","False"], answer: "False" },
-      { q: "Dynamic prompts change with context.", options: ["True","False"], answer: "True" },
-      { q: "Temperature setting adjusts AI randomness.", options: ["True","False"], answer: "True" },
-      { q: "Chain-of-thought prompts prevent reasoning.", options: ["True","False"], answer: "False" },
-      { q: "Output conditioning guides AI output.", options: ["True","False"], answer: "True" },
-      { q: "Prompt evaluation ignores clarity.", options: ["True","False"], answer: "False" },
-      { q: "Instruction-based prompts start with commands.", options: ["True","False"], answer: "True" },
-      { q: "Ambiguous prompts improve AI output.", options: ["True","False"], answer: "False" },
-      { q: "AI output depends on prompt quality.", options: ["True","False"], answer: "True" },
-      { q: "Few-shot and zero-shot are same.", options: ["True","False"], answer: "False" },
-      { q: "Prompt tokens are units of text.", options: ["True","False"], answer: "True" },
-      { q: "Chain-of-thought is for step-by-step reasoning.", options: ["True","False"], answer: "True" },
-      { q: "Prompt feedback improves accuracy.", options: ["True","False"], answer: "True" },
-      { q: "Contextual prompts give background info.", options: ["True","False"], answer: "True" },
-      { q: "Random word prompts are effective.", options: ["True","False"], answer: "False" },
-      { q: "Prompt length should be detailed enough.", options: ["True","False"], answer: "True" },
-      { q: "Prompt tone affects AI response.", options: ["True","False"], answer: "True" },
-      { q: "Role prompts affect AI persona.", options: ["True","False"], answer: "True" },
-      { q: "Prompt clarity is optional.", options: ["True","False"], answer: "False" },
-      { q: "Prompt chaining can improve reasoning.", options: ["True","False"], answer: "True" },
-    ];
+// Shuffle options for each question
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
-    // Shuffle options
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
+// Render all questions
+function renderQuestions() {
+  examForm.innerHTML = '';
+  questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div');
+    qDiv.classList.add('bg-gray-700','p-4','rounded','shadow-md');
 
-    // Render Questions
-    function renderQuestions() {
-      examForm.innerHTML = '';
-      questions.forEach((q, idx) => {
-        const qDiv = document.createElement('div');
-        qDiv.classList.add('bg-gray-700','p-4','rounded','shadow-md');
+    const shuffledOptions = shuffle([...q.options]);
+    let optionsHTML = '';
+    shuffledOptions.forEach(opt => {
+      optionsHTML += `
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="q${idx}" value="${opt}" class="accent-pink-500">
+          ${opt}
+        </label>
+      `;
+    });
 
-        const shuffledOptions = shuffle([...q.options]);
-        let optionsHTML = '';
-        shuffledOptions.forEach(opt => {
-          optionsHTML += `
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="q${idx}" value="${opt}" class="accent-pink-500">
-              ${opt}
-            </label>
-          `;
-        });
+    qDiv.innerHTML = `<p class="font-semibold mb-2">${q.q}</p>${optionsHTML}`;
+    examForm.appendChild(qDiv);
 
-        qDiv.innerHTML = `
-          <p class="font-semibold mb-2">${q.q}</p>
-          ${optionsHTML}
-        `;
-        examForm.appendChild(qDiv);
-
-        // Instant feedback
-        examForm.querySelectorAll(`input[name=q${idx}]`).forEach(input => {
-          input.addEventListener('change', e => {
-            if (e.target.value === questions[idx].answer) {
-              e.target.parentElement.classList.add('bg-green-600','text-white','p-2','rounded');
-            } else {
-              e.target.parentElement.classList.add('bg-red-600','text-white','p-2','rounded');
-            }
-            examForm.querySelectorAll(`input[name=q${idx}]`).forEach(r => r.disabled = true);
-          });
-        });
-      });
-    }
-
-    // Timer
-    function startTimer(seconds) {
-      let time = seconds;
-      countdown = setInterval(() => {
-        const mins = String(Math.floor(time / 60)).padStart(2,'0');
-        const secs = String(time % 60).padStart(2,'0');
-        timerEl.textContent = `${mins}:${secs}`;
-        if (time <= 0) {
-          clearInterval(countdown);
-          submitExam.click();
+    // Instant feedback
+    examForm.querySelectorAll(`input[name=q${idx}]`).forEach(input => {
+      input.addEventListener('change', e => {
+        if (e.target.value === questions[idx].answer) {
+          e.target.parentElement.classList.add('bg-green-600','text-white','p-2','rounded');
+        } else {
+          e.target.parentElement.classList.add('bg-red-600','text-white','p-2','rounded');
         }
-        time--;
-      }, 1000);
-    }
-
-    // WhatsApp Notification Function
-    function sendWhatsApp(message) {
-      const number = "0606614909";
-      const url = `https://api.whatsapp.com/send?phone=${number}&text=${encodeURIComponent(message)}`;
-      window.open(url, "_blank");
-    }
-
-    // Start Exam
-    studentForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const studentId = document.getElementById('studentId').value;
-      const nameSurname = document.getElementById('nameSurname').value;
-
-      // Notify WhatsApp student started
-      sendWhatsApp(`Exam started: ${studentId} - ${nameSurname}`);
-
-      studentForm.parentElement.style.display = 'none';
-      examSection.style.display = 'block';
-      renderQuestions();
-      startTimer(duration);
-    });
-
-    // Submit Exam
-    submitExam.addEventListener('click', () => {
-      clearInterval(countdown);
-
-      const formData = new FormData(examForm);
-      let score = 0;
-      questions.forEach((q, idx) => {
-        if (formData.get(`q${idx}`) === q.answer) score++;
+        examForm.querySelectorAll(`input[name=q${idx}]`).forEach(r => r.disabled = true);
       });
-      const percentage = (score / questions.length) * 100;
-
-      // Notify WhatsApp with result
-      sendWhatsApp(`Exam completed. Score: ${percentage.toFixed(2)}%`);
-
-      alert("Exam submitted! Please check WhatsApp for results.");
-
-      location.reload();
     });
-  </script>
+  });
+}
+
+// Timer
+function startTimer(seconds) {
+  let time = seconds;
+  countdown = setInterval(() => {
+    const mins = String(Math.floor(time / 60)).padStart(2,'0');
+    const secs = String(time % 60).padStart(2,'0');
+    timerEl.textContent = `${mins}:${secs}`;
+    if (time <= 0) {
+      clearInterval(countdown);
+      submitExam.click();
+    }
+    time--;
+  }, 1000);
+}
+
+// WhatsApp Notification
+function sendWhatsApp(message) {
+  const number = "0606614909";
+  const url = `https://api.whatsapp.com/send?phone=${number}&text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+}
+
+// Start Exam
+studentForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const studentId = document.getElementById('studentId').value;
+  const nameSurname = document.getElementById('nameSurname').value;
+
+  sendWhatsApp(`Exam started: ${studentId} - ${nameSurname}`);
+  studentForm.parentElement.style.display = 'none';
+  examSection.style.display = 'block';
+  renderQuestions();
+  startTimer(duration);
+});
+
+// Submit Exam
+submitExam.addEventListener('click', () => {
+  clearInterval(countdown);
+  const formData = new FormData(examForm);
+  let score = 0;
+  questions.forEach((q, idx) => {
+    if (formData.get(`q${idx}`) === q.answer) score++;
+  });
+  const total = questions.length;
+  const percentage = (score / total) * 100;
+  const nameSurname = document.getElementById('nameSurname').value;
+
+  let resultMsg = '';
+  if (percentage >= passMark) {
+    resultMsg = `🎉 Congratulations ${nameSurname}! You have passed 👨‍💻🔥✅\nScore: ${score}/${total} (${percentage.toFixed(2)}%)`;
+  } else {
+    resultMsg = `😅 Keep pushing, ${nameSurname}! Don’t give up 💪🔥✨\nScore: ${score}/${total} (${percentage.toFixed(2)}%)`;
+  }
+
+  sendWhatsApp(resultMsg);
+  alert(resultMsg);
+  location.reload();
+});
+</script>
 </body>
 </html>
